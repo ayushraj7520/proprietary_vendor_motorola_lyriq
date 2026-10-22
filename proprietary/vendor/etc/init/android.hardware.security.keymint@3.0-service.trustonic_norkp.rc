@@ -1,0 +1,12 @@
+service vendor.keymint-trustonic /vendor/bin/hw/android.hardware.security.keymint@3.0-service.trustonic_norkp
+    class early_hal
+    user system
+    group system
+    # Wait for TEE daemon to be ready before starting keymint.
+    # Without this, mcOpenTrustlet returns NO_FREE_INSTANCES (rc 0x27)
+    # because DrAndroid hasn't loaded yet, causing a crash loop.
+    disabled
+
+# Start keymint only after TEE (mcDriverDaemon) signals readiness
+on property:ro.vendor.trustonic.ready=true
+    start vendor.keymint-trustonic
